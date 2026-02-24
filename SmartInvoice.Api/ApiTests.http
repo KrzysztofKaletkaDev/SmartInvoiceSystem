@@ -2,16 +2,16 @@
 GET https://localhost:7040/api/invoices
 Accept: application/json
 
-
+### 
 
 
 POST https://localhost:7040/api/invoices
 Content-Type: application/json
 
 {
-  "invoiceNumber": "FV/TEST/001",
+  "invoiceNumber": "FV/ARCH/001",
   "contractorName": "Google",
   "netAmount": 100.00,
   "grossAmount": 123.00,
-  "issueDate": "2026-02-11T18:00:00"
+  "issueDate": "2026-02-24T18:00:00"
 }

@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SmartInvoice.Api.Models;
 using Microsoft.EntityFrameworkCore;
 using SmartInvoice.Api.Data;
 using SmartInvoice.Api.DTOs;
+using SmartInvoice.Api.Models;
+using SmartInvoice.Api.Services;
 
 namespace SmartInvoice.Api.Controllers
 {
@@ -10,40 +11,34 @@ namespace SmartInvoice.Api.Controllers
     [ApiController]
     public class InvoicesController : ControllerBase
     {
+        private readonly IInvoiceService _invoiceService;
         private readonly AppDbContext _context;
-        public InvoicesController(AppDbContext context)
+
+        public InvoicesController(IInvoiceService invoiceService, AppDbContext context)
         {
+            _invoiceService = invoiceService;
             _context = context;
         }
+
+        [HttpPost]
+        public async Task<ActionResult<InvoiceDTO>> PostInvoice(CreateInvoiceDto createDto)
+        {
+            var resultDto = await _invoiceService.AddInvoiceAsync(createDto);
+
+            return CreatedAtAction(nameof(GetInvoices), new { id = resultDto.Id }, resultDto);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Invoice>> GetInvoices(int id)
+        {
+            var invoice = await _context.Invoices.FindAsync(id);
+            if (invoice == null) return NotFound();
+            return invoice;
+        }
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Invoice>>> GetInvoices()
+        public async Task<ActionResult<IEnumerable<Invoice>>> GetAllInvoices()
         {
             return await _context.Invoices.ToListAsync();
-        }
-        [HttpPost]
-        public async Task<ActionResult<InvoiceDTO>> PostInvoice(CreateInvoiceDto createDTO)
-        {
-            var newInvoice = new Invoice
-            {
-                InvoiceNumber = createDTO.InvoiceNumber,
-                ContractorName = createDTO.ContractorName,
-                NetAmount = createDTO.NetAmount,
-                GrossAmount = createDTO.GrossAmount,
-                IssueDate = createDTO.IssueDate
-            };
-            _context.Invoices.Add(newInvoice);
-            await _context.SaveChangesAsync();
-            var responseDTO = new InvoiceDTO
-            {
-                Id = newInvoice.Id,
-                InvoiceNumber = newInvoice.InvoiceNumber,
-                ContractorName = newInvoice.ContractorName,
-                NetAmount = newInvoice.NetAmount,
-                GrossAmount = newInvoice.GrossAmount,
-                IssueDate = newInvoice.IssueDate,
-                OcrContent = newInvoice.OcrContent
-            };
-            return CreatedAtAction(nameof(GetInvoices), new { id = responseDTO.Id }, responseDTO);
         }
     }
 }
