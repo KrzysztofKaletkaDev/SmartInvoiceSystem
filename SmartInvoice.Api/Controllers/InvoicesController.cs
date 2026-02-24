@@ -2,6 +2,7 @@
 using SmartInvoice.Api.Models;
 using Microsoft.EntityFrameworkCore;
 using SmartInvoice.Api.Data;
+using SmartInvoice.Api.DTOs;
 
 namespace SmartInvoice.Api.Controllers
 {
@@ -20,11 +21,29 @@ namespace SmartInvoice.Api.Controllers
             return await _context.Invoices.ToListAsync();
         }
         [HttpPost]
-        public async Task<ActionResult<Invoice>> PostInvoice(Invoice invoice)
+        public async Task<ActionResult<InvoiceDTO>> PostInvoice(CreateInvoiceDto createDTO)
         {
-            _context.Invoices.Add(invoice);
+            var newInvoice = new Invoice
+            {
+                InvoiceNumber = createDTO.InvoiceNumber,
+                ContractorName = createDTO.ContractorName,
+                NetAmount = createDTO.NetAmount,
+                GrossAmount = createDTO.GrossAmount,
+                IssueDate = createDTO.IssueDate
+            };
+            _context.Invoices.Add(newInvoice);
             await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetInvoices), new { id = invoice.Id }, invoice);
+            var responseDTO = new InvoiceDTO
+            {
+                Id = newInvoice.Id,
+                InvoiceNumber = newInvoice.InvoiceNumber,
+                ContractorName = newInvoice.ContractorName,
+                NetAmount = newInvoice.NetAmount,
+                GrossAmount = newInvoice.GrossAmount,
+                IssueDate = newInvoice.IssueDate,
+                OcrContent = newInvoice.OcrContent
+            };
+            return CreatedAtAction(nameof(GetInvoices), new { id = responseDTO.Id }, responseDTO);
         }
     }
 }
