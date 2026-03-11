@@ -12,6 +12,7 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 builder.Services.AddOpenApi();
+builder.Services.AddScoped<OcrService>();
 
 var app = builder.Build();
 

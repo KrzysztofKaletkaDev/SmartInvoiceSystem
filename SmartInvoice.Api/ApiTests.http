@@ -5,13 +5,10 @@ Accept: application/json
 ### 
 
 
-POST https://localhost:7040/api/invoices
+POST http://localhost:5029/api/invoices
 Content-Type: application/json
 
 {
-  "invoiceNumber": "FV/ARCH/001",
-  "contractorName": "Google",
-  "netAmount": 100.00,
-  "grossAmount": 123.00,
-  "issueDate": "2026-02-24T18:00:00"
+  "amount": 1500.50,
+  "date": "2026-03-11"
 }
